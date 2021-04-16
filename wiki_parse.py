@@ -16,7 +16,7 @@ def get_article_wikitext(article_title: str):
     return response["parse"]["wikitext"]
 
 
-def parse_article(article_url: str):
+def parse_article_wikitext(article_url: str):
     """
     Requests and parses the list article at article_url.
     The URL must be in the format en.wikipedia.org/wiki/<title>
