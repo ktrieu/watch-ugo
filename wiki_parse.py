@@ -9,14 +9,14 @@ session = requests.session()
 session.headers.update({"User-Agent": "WatchUGO (kevin.trieu5813@gmail.com)"})
 
 
-def get_article_wikitext(article_title: str):
+def get_article_wikitext(article_title: str) -> str:
     request_url = WIKIPEDIA_WIKITEXT_URL + article_title
     response = session.get(request_url).json()
     print(response)
     return response["parse"]["wikitext"]
 
 
-def parse_article_wikitext(article_url: str):
+def parse_article_wikitext(article_url: str) -> wtp.WikiText:
     """
     Requests and parses the list article at article_url.
     The URL must be in the format en.wikipedia.org/wiki/<title>
