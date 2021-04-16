@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 requests = "*"
+wikitextparser = "*"
 
 [requires]
 python_version = "3.8"

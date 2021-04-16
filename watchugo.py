@@ -1,9 +1,10 @@
 import argparse
 
+import vid_def
+
 
 def subcommand_build_video_def(args):
-    print("Building video definition...")
-    print(args)
+    vid_def.video_def_from_list_url(args.url)
 
 
 def subcommand_render_video(args):

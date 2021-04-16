@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+import wiki_parse
+
 
 @dataclass
 class Segment:
@@ -23,4 +25,4 @@ class VideoDef:
 
 
 def video_def_from_list_url(url: str) -> VideoDef:
-    return None
+    parsed = wiki_parse.parse_article(url)
