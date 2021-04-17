@@ -40,7 +40,7 @@ def video_title_from_article_title(title: str, n_segments: int) -> str:
     unescaped_title = unescaped_title.replace("List of ", "")
     # capitalize the first letter of the unescaped title
     unescaped_title = unescaped_title[0].capitalize() + unescaped_title[1:]
-    return f"WatchUGO: Top {n_segments} {unescaped_title} of All Time"
+    return f"Top {n_segments} {unescaped_title} of All Time"
 
 
 def filter_nonexistent_video_items(
