@@ -12,6 +12,7 @@ wikitextparser = "*"
 mwapi = "*"
 jsonpickle = "*"
 moviepy = "*"
+gtts = "*"
 
 [requires]
 python_version = "3.8"

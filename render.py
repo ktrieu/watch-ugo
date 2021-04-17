@@ -1,5 +1,6 @@
 import moviepy.editor as mpy
 import jsonpickle
+import voice
 
 import vid_def
 
@@ -17,8 +18,24 @@ def load_video_def_from_file(file_path: str) -> vid_def.VideoDef:
         return jsonpickle.decode(f.read())
 
 
+# We need that space between U and GO, or Google will read it wrong.
+INTRO_TEXT = "Welcome back to Watch U GO. Today, we're looking at the"
+
+
+def generate_intro_text(video_title: str) -> str:
+    return f"{INTRO_TEXT} {video_title}"
+
+
 def render_intro_clip(video_def: vid_def.VideoDef) -> mpy.VideoClip:
-    return None
+    intro_audio = voice.tts_speak(generate_intro_text(video_def.title))
+    intro_bg = mpy.ColorClip((VIDEO_WIDTH, VIDEO_HEIGHT))
+
+    intro_clip = mpy.CompositeVideoClip([intro_bg])
+    intro_clip = (
+        intro_clip.set_audio(intro_audio).set_duration(intro_audio.duration).set_fps(24)
+    )
+
+    return intro_clip
 
 
 def render_segment(segment: vid_def.Segment) -> mpy.VideoClip:
@@ -28,9 +45,9 @@ def render_segment(segment: vid_def.Segment) -> mpy.VideoClip:
 def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
     intro_clip = render_intro_clip(video_def)
 
-    segment_clips = list(map(render_segment, video_def.segments))
+    # segment_clips = list(map(render_segment, video_def.segments))
 
-    final_video = mpy.concatenate_videoclips([intro_clip, *segment_clips])
+    final_video = intro_clip
 
     return final_video
 
