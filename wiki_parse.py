@@ -12,6 +12,9 @@ def get_article_title_from_url(url: str) -> str:
     Extracts the Wikipedia article title from a Wikipedia URL.
 
     This returns the URL in unescaped form, i.e., Like_This.
+
+    If the URL is not in the format en.wikipedia.org/wiki/<title>,
+    a ValueError is raised.
     """
     # url parse doesn't properly parse the domain if a protocol isn't present
     if not url.startswith("http"):
@@ -26,14 +29,10 @@ def get_article_title_from_url(url: str) -> str:
     return result.path.replace("/wiki/", "")
 
 
-def parse_article_wikitext(article_url: str) -> wtp.WikiText:
+def parse_article_wikitext(article_title: str) -> wtp.WikiText:
     """
-    Requests and parses the list article at article_url.
-    The URL must be in the format en.wikipedia.org/wiki/<title>
-    or an error will be raised.
+    Requests and parses the Wikipedia article named article_title.
     """
-
-    article_title = get_article_title_from_url(article_url)
     wikitext = wiki_api.get_article_wikitext(article_title)
     parsed = wtp.parse(wikitext)
     return parsed

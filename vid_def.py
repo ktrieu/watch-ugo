@@ -29,7 +29,8 @@ class VideoDef:
 
 
 def video_def_from_list_url(url: str) -> VideoDef:
-    parsed = wiki_parse.parse_article_wikitext(url)
+    article_title = wiki_parse.get_article_title_from_url(url)
+    parsed = wiki_parse.parse_article_wikitext(article_title)
     video_items = wiki_parse.extract_video_items(parsed)
 
     # filter out pages that don't exist
