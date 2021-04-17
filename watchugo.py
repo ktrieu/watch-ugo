@@ -3,6 +3,7 @@ import os
 
 import vid_def
 import render
+import temp
 
 
 def subcommand_build_video_def(args):
@@ -73,3 +74,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.command(args)
+
+    temp.remove_all_temp_files()
