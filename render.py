@@ -8,9 +8,23 @@ import vid_def
 VIDEO_WIDTH = 1920
 VIDEO_HEIGHT = 1080
 
-# Landmarks for text insertion, in (top left), (top right) format
-NUMBER_TEXT_BOX = ((122, 95), (248, 221))
-SEGMENT_NAME_BOX = ((113, 875), (912, 986))
+# File locations
+OVERLAY_LOCATION = "img/watchugo_text_overlay.png"
+INTRO_SLATE_LOCATION = "img/watchugo_intro_slate.png"
+
+FONT_PATH = "KronaOne-Regular.ttf"
+
+# Landmarks for text insertion
+NUMBER_TEXT_ORIGIN = (122, 95)
+NUMBER_TEXT_SIZE = (126, 126)
+SEGMENT_NAME_ORIGIN = (113, 875)
+SEGMENT_NAME_SIZE = (799, 111)
+
+INTRO_SLATE_TEXT_ORIGIN = (147, 462)
+INTRO_SLATE_TEXT_SIZE = (1626, 216)
+
+# Timing constnats
+INTRO_SLATE_WAIT_SECS = 2
 
 
 def load_video_def_from_file(file_path: str) -> vid_def.VideoDef:
@@ -22,17 +36,23 @@ def load_video_def_from_file(file_path: str) -> vid_def.VideoDef:
 INTRO_TEXT = "Welcome back to Watch U GO. Today, we're looking at the"
 
 
-def generate_intro_text(video_title: str) -> str:
+def generate_intro_tts_text(video_title: str) -> str:
     return f"{INTRO_TEXT} {video_title}"
 
 
 def render_intro_clip(video_def: vid_def.VideoDef) -> mpy.VideoClip:
-    intro_audio = voice.tts_speak(generate_intro_text(video_def.title))
-    intro_bg = mpy.ColorClip((VIDEO_WIDTH, VIDEO_HEIGHT))
+    intro_audio = voice.tts_speak(generate_intro_tts_text(video_def.title))
+    intro_img = mpy.ImageClip(INTRO_SLATE_LOCATION)
 
-    intro_clip = mpy.CompositeVideoClip([intro_bg])
+    intro_text = mpy.TextClip(
+        txt=video_def.title, size=INTRO_SLATE_TEXT_SIZE, font=FONT_PATH, color="black"
+    ).set_position(INTRO_SLATE_TEXT_ORIGIN)
+
     intro_clip = (
-        intro_clip.set_audio(intro_audio).set_duration(intro_audio.duration).set_fps(24)
+        mpy.CompositeVideoClip([intro_img, intro_text])
+        .set_duration((intro_audio.duration + INTRO_SLATE_WAIT_SECS))
+        .set_fps(24)
+        .set_audio(intro_audio)
     )
 
     return intro_clip
