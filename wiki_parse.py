@@ -38,12 +38,21 @@ def parse_article_wikitext(article_title: str) -> wtp.WikiText:
     return parsed
 
 
-def escape_wikilink_target(target: str) -> str:
+def escape_article_title(title: str) -> str:
     """
     Escape bare wikilink article titles so we can pass them into the API.
     This is almost certainly broken.
     """
-    return target.replace(" ", "_")
+    return title.replace(" ", "_")
+
+
+def unescape_article_title(title: str) -> str:
+    """
+    Unescape article titles for display.
+    As the inverse of above, this is also probably broken.
+    """
+
+    return title.replace("_", " ")
 
 
 @dataclass
@@ -55,7 +64,7 @@ class VideoItem:
 
 
 def video_item_from_wikilink(wikilink: wtp.WikiLink) -> VideoItem:
-    return VideoItem(wikilink.title, escape_wikilink_target(wikilink.target))
+    return VideoItem(wikilink.title, escape_article_title(wikilink.target))
 
 
 def extract_list(wikilist: wtp.WikiList) -> List[VideoItem]:
