@@ -22,8 +22,6 @@ class VideoDef:
 
     # The title of the video.
     title: str
-    # The YouTube description of the video.
-    description: str
     # A list of segments to include in the video.
     segments: List[Segment]
 
