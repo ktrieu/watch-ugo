@@ -3,3 +3,7 @@
 
 # Python
 *.pyc
+
+# Tool output
+video.json
+video.mp4
