@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+import random
 
 import wiki_parse
 
@@ -9,6 +10,8 @@ class Segment:
 
     # The name of the item in this segment.
     name: str
+    # The text to read while displaying this segment.
+    description: str
     # The URL of the image to display in this segment.
     image_url: str
 
@@ -27,3 +30,17 @@ class VideoDef:
 def video_def_from_list_url(url: str) -> VideoDef:
     parsed = wiki_parse.parse_article_wikitext(url)
     video_items = wiki_parse.extract_video_items(parsed)
+
+    # filter out pages that don't exist
+    item_titles = list(map(lambda item: item.article_title, video_items))
+    exist_dict = wiki_parse.get_articles_exists(item_titles)
+    video_items = list(filter(lambda item: exist_dict[item.article_title], video_items))
+
+    n_segments = min(10, len(video_items))
+
+    # secret top 10 selection algorithm
+    top_items = random.sample(video_items, n_segments)
+
+    segments = list(map(wiki_parse.segment_from_video_item, top_items))
+
+    return segments
