@@ -3,6 +3,7 @@ from typing import List
 import random
 
 import wiki_parse
+import wiki_api
 
 
 @dataclass
@@ -33,7 +34,7 @@ def video_def_from_list_url(url: str) -> VideoDef:
 
     # filter out pages that don't exist
     item_titles = list(map(lambda item: item.article_title, video_items))
-    exist_dict = wiki_parse.get_articles_exists(item_titles)
+    exist_dict = wiki_api.get_articles_exists(item_titles)
     video_items = list(filter(lambda item: exist_dict[item.article_title], video_items))
 
     n_segments = min(10, len(video_items))
