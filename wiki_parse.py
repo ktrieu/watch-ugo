@@ -141,6 +141,25 @@ def get_articles_exists(article_titles: List[str]) -> Dict[str, bool]:
     return result
 
 
+def get_article_title_from_url(url: str) -> str:
+    """
+    Extracts the Wikipedia article title from a Wikipedia URL.
+
+    This returns the URL in unescaped form, i.e., Like_This.
+    """
+    # url parse doesn't properly parse the domain if a protocol isn't present
+    if not url.startswith("http"):
+        url = "http://" + url
+
+    result = urlparse(url)
+    if result.netloc != "en.wikipedia.org" or not result.path.startswith("/wiki/"):
+        raise ValueError(
+            "The article URL must have the format en.wikipedia.org/wiki/<title>."
+        )
+
+    return result.path.replace("/wiki/", "")
+
+
 def parse_article_wikitext(article_url: str) -> wtp.WikiText:
     """
     Requests and parses the list article at article_url.
@@ -148,17 +167,7 @@ def parse_article_wikitext(article_url: str) -> wtp.WikiText:
     or an error will be raised.
     """
 
-    # url parse doesn't properly parse the domain if a protocol isn't present
-    if not article_url.startswith("http"):
-        article_url = "http://" + article_url
-
-    result = urlparse(article_url)
-    if result.netloc != "en.wikipedia.org" or not result.path.startswith("/wiki/"):
-        raise ValueError(
-            "The article URL must have the format en.wikipedia.org/wiki/<title>."
-        )
-
-    article_title = result.path.replace("/wiki/", "")
+    article_title = get_article_title_from_url(article_url)
     wikitext = get_article_wikitext(article_title)
     parsed = wtp.parse(wikitext)
     return parsed
