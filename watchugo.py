@@ -1,6 +1,8 @@
 import argparse
+import os
 
 import vid_def
+import render
 
 
 def subcommand_build_video_def(args):
@@ -8,9 +10,16 @@ def subcommand_build_video_def(args):
     vid_def.save_video_def(video_def, args.out)
 
 
+def get_default_output_path(input_path: str):
+    return os.path.splitext(input_path)[0] + ".mp4"
+
+
 def subcommand_render_video(args):
-    print("Rendering video...")
-    print(args)
+    video_def = render.load_video_def_from_file(args.file)
+    clip = render.render_video_def(video_def)
+    if args.out is None:
+        args.out = get_default_output_path(args.file)
+    render.save_file(args.out, clip)
 
 
 def subcommand_full(args):
