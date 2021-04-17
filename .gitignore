@@ -7,3 +7,6 @@
 # Tool output
 video.json
 video.mp4
+
+# Our custom font
+*.ttf
