@@ -105,10 +105,6 @@ def get_article_extract(article_title: str) -> str:
     return page["extract"]
 
 
-WIKIPEDIA_EXISTS_URL = (
-    "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=info&titles="
-)
-
 MAX_TITLES_PER_QUERY = 50
 
 
