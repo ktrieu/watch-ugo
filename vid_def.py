@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Union
 import random
+
+import jsonpickle
 
 import wiki_parse
 import wiki_api
@@ -58,4 +60,14 @@ def video_def_from_list_url(url: str) -> VideoDef:
     segments = list(map(wiki_parse.segment_from_video_item, top_items))
 
     video_title = video_title_from_article_title(article_title, n_segments)
-    return segments
+    return VideoDef(video_title, segments)
+
+
+def save_video_def(video_def: VideoDef, output_path: Union[str, None]):
+    if output_path is None:
+        output_path = f'{video_def.title.replace(":", "_").replace(" ", "_")}.json'
+
+    json = jsonpickle.encode(video_def, indent=True)
+
+    with open(output_path, "w") as file:
+        file.write(json)

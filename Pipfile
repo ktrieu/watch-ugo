@@ -10,6 +10,7 @@ black = "*"
 requests = "*"
 wikitextparser = "*"
 mwapi = "*"
+jsonpickle = "*"
 
 [requires]
 python_version = "3.8"

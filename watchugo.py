@@ -4,7 +4,8 @@ import vid_def
 
 
 def subcommand_build_video_def(args):
-    vid_def.video_def_from_list_url(args.url)
+    video_def = vid_def.video_def_from_list_url(args.url)
+    vid_def.save_video_def(video_def, args.out)
 
 
 def subcommand_render_video(args):
@@ -48,7 +49,10 @@ def setup_argparser():
         "file", type=str, help="The location of the video definition file."
     )
     render_vid_parser.add_argument(
-        "--out", type=str, default=None, help="The output path for the video file.",
+        "--out",
+        type=str,
+        default=None,
+        help="The output path for the video file.",
     )
     render_vid_parser.set_defaults(command=subcommand_render_video)
 
@@ -60,4 +64,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.command(args)
-
