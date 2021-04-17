@@ -7,10 +7,11 @@ import vid_def
 import wikitextparser as wtp
 import mwapi
 
+USER_AGENT = "WatchUGO/1.0 (kevin.trieu5813@gmail.com)"
 
-session = mwapi.Session(
-    "https://en.wikipedia.org", user_agent="WatchUGO/1.0 (kevin.trieu5813@gmail.com)"
-)
+wikipedia_session = mwapi.Session("https://en.wikipedia.org", user_agent=USER_AGENT)
+
+commons_session = mwapi.Session("https://commons.wikimedia.org/", user_agent=USER_AGENT)
 
 
 def split_every(n, iterable):
@@ -25,14 +26,14 @@ def split_every(n, iterable):
 
 
 def get_article_wikitext(article_title: str) -> str:
-    response = session.get(
+    response = wikipedia_session.get(
         action="parse", page=article_title, prop="wikitext", formatversion="2"
     )
     return response["parse"]["wikitext"]
 
 
 def get_article_image_url(article_title: str) -> str:
-    response = session.get(
+    response = wikipedia_session.get(
         action="query",
         titles=article_title,
         prop="pageimages",
@@ -50,11 +51,45 @@ def get_article_image_url(article_title: str) -> str:
         return None
 
 
+def commons_search_image(search: str) -> str:
+    """
+    Search Wikimedia Commons for `search`, and returns the *name*
+    of the first image result.
+    """
+    # Wikimedia Commons lets us specify a MIME type to filter by images only
+    search_query = search + " filetype:image"
+    response = commons_session.get(
+        action="query", list="search", srsearch=search_query, srnamespace="6"
+    )
+
+    first_result = response["query"]["search"][0]
+
+    return first_result["title"]
+
+
+def get_fallback_article_image_url(article_title: str) -> str:
+    """
+    Some Wikipedia articles have no associated image. As a fallback, we search on
+    Wikimedia Commons with the article title and grab the first result.
+    """
+    fallback_image_title = commons_search_image(article_title)
+
+    response = commons_session.get(
+        action="query", prop="imageinfo", titles=fallback_image_title, iiprop="url"
+    )
+    pages = response["query"]["pages"]
+    # Wikipedia returns a dictionary of pages.
+    # Since we only ever query one, we can just grab the first one.
+    page = list(pages.items())[0][1]
+
+    return page["imageinfo"][0]["url"]
+
+
 EXTRACTS_MAX_CHARS = 500
 
 
 def get_article_extract(article_title: str) -> str:
-    response = session.get(
+    response = wikipedia_session.get(
         action="query",
         prop="extracts",
         exchars=EXTRACTS_MAX_CHARS,
@@ -91,7 +126,7 @@ def get_articles_exists(article_titles: List[str]) -> Dict[str, bool]:
 
     for chunk in title_chunks:
         joined_titles = "|".join(chunk)
-        responses = session.get(
+        responses = wikipedia_session.get(
             action="query", prop="info", titles=joined_titles, continuation=True
         )
 
@@ -223,6 +258,8 @@ def segment_from_video_item(item: VideoItem) -> "vid_def.Segment":
     segment_desc = clean_extract(get_article_extract(item.article_title))
 
     image_url = get_article_image_url(item.article_title)
+    if image_url is None:
+        image_url = get_fallback_article_image_url(item.article_title)
 
     return vid_def.Segment(
         name=item.name, description=segment_desc, image_url=image_url
