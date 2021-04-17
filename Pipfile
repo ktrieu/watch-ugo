@@ -11,6 +11,7 @@ requests = "*"
 wikitextparser = "*"
 mwapi = "*"
 jsonpickle = "*"
+moviepy = "*"
 
 [requires]
 python_version = "3.8"
