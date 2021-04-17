@@ -43,15 +43,22 @@ def video_title_from_article_title(title: str, n_segments: int) -> str:
     return f"WatchUGO: Top {n_segments} {unescaped_title} of All Time"
 
 
+def filter_nonexistent_video_items(
+    items: List[wiki_parse.VideoItem],
+) -> List[wiki_parse.VideoItem]:
+    """
+    Filters out video times that point to a Wikipedia article that doesn't exist.
+    """
+    item_titles = list(map(lambda item: item.article_title, items))
+    exist_dict = wiki_api.get_articles_exists(item_titles)
+    return list(filter(lambda item: exist_dict[item.article_title], items))
+
+
 def video_def_from_list_url(url: str) -> VideoDef:
     article_title = wiki_parse.get_article_title_from_url(url)
     parsed = wiki_parse.parse_article_wikitext(article_title)
     video_items = wiki_parse.extract_video_items(parsed)
-
-    # filter out pages that don't exist
-    item_titles = list(map(lambda item: item.article_title, video_items))
-    exist_dict = wiki_api.get_articles_exists(item_titles)
-    video_items = list(filter(lambda item: exist_dict[item.article_title], video_items))
+    video_items = filter_nonexistent_video_items(video_items)
 
     n_segments = min(10, len(video_items))
 
