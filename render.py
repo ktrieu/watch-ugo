@@ -68,7 +68,7 @@ def get_segment_tts(num: int, segment: vid_def.Segment) -> mpy.AudioClip:
     return render_util.tts_speak(text)
 
 
-BLUR_FILTER = PIL.ImageFilter.GaussianBlur(radius=4)
+BLUR_FILTER = PIL.ImageFilter.GaussianBlur(radius=10)
 
 
 def blur_filter(frame):
