@@ -1,4 +1,5 @@
 import moviepy.editor as mpy
+import moviepy.video.fx.all as vfx
 import numpy as np
 import PIL.ImageFilter
 import PIL.Image
@@ -68,18 +69,17 @@ def get_segment_tts(num: int, segment: vid_def.Segment) -> mpy.AudioClip:
     return render_util.tts_speak(text)
 
 
-BLUR_FILTER = PIL.ImageFilter.GaussianBlur(radius=10)
-
-
 def blur_filter(frame):
     pil_image = PIL.Image.fromarray(frame)
-    pil_image = pil_image.filter(BLUR_FILTER)
-    return np.array(pil_image)
+    pil_image = pil_image.filter(PIL.ImageFilter.GaussianBlur(radius=50))
+    blurred = np.array(pil_image)
+    blurred.reshape(frame.shape)
+    return blurred
 
 
 def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
     audio_clip = get_segment_tts(num, segment)
-    image_clip = render_util.image_download(segment.image_url)
+    image_clip = render_util.image_download(segment.image_url).to_RGB()
 
     text_overlay_clip = mpy.ImageClip(OVERLAY_LOCATION)
     name_text = mpy.TextClip(
@@ -90,28 +90,23 @@ def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
         txt=f"{num}", size=NUMBER_TEXT_SIZE, font=FONT_PATH, color="white"
     ).set_position(NUMBER_TEXT_ORIGIN)
 
-    image_blurred = image_clip.fl_image(blur_filter)
+    aspect_ratio = image_clip.w / image_clip.h
 
-    scale_factors = (
-        VIDEO_WIDTH / image_clip.size[0],
-        VIDEO_HEIGHT / image_clip.size[1],
-    )
+    if aspect_ratio <= VIDEO_WIDTH / VIDEO_HEIGHT:
+        image_clip = image_clip.resize(height=VIDEO_HEIGHT)
+        image_blurred = image_clip.resize(width=VIDEO_WIDTH)
+    else:
+        image_clip = image_clip.resize(width=VIDEO_WIDTH)
+        image_blurred = image_clip.resize(height=VIDEO_HEIGHT)
 
-    min_scale_factor = min(scale_factors)
-    min_width = int(image_clip.w * min_scale_factor)
-    min_height = int(image_clip.h * min_scale_factor)
+    image_clip = image_clip.set_position(("center", "center"))
 
-    image_clip = image_clip.resize(width=min_width, height=min_height).set_position(
-        ("center", "center")
-    )
-
-    max_scale_factor = max(scale_factors)
-    max_width = int(image_clip.w * max_scale_factor)
-    max_height = int(image_clip.h * max_scale_factor)
-
-    image_blurred = image_clip.resize(width=max_width, height=max_height).set_position(
-        ("center", "center")
-    )
+    image_blurred = image_blurred.crop(
+        width=VIDEO_WIDTH,
+        height=VIDEO_HEIGHT,
+        x_center=image_blurred.w / 2,
+        y_center=image_blurred.h / 2,
+    ).fl_image(blur_filter)
 
     return (
         mpy.CompositeVideoClip(
@@ -129,7 +124,9 @@ def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
 
     segment_clips = []
     for idx, segment in enumerate(video_def.segments):
-        segment_clips.append(render_segment(idx + 1, segment))
+        segment_clip = render_segment(idx + 1, segment)
+        segment_clip.save_frame(f"{idx}.png")
+        segment_clips.append(segment_clip)
 
     final_video = concatenate_videoclips([intro_clip, *reversed(segment_clips)])
 
