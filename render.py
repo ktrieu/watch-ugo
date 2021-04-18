@@ -97,10 +97,19 @@ def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
         VIDEO_HEIGHT / image_clip.size[1],
     )
 
-    image_clip = image_clip.resize(min(scale_factors)).set_position(
+    min_scale_factor = min(scale_factors)
+    min_width = int(image_clip.w * min_scale_factor)
+    min_height = int(image_clip.h * min_scale_factor)
+
+    image_clip = image_clip.resize(width=min_width, height=min_height).set_position(
         ("center", "center")
     )
-    image_blurred = image_clip.resize(max(scale_factors)).set_position(
+
+    max_scale_factor = max(scale_factors)
+    max_width = int(image_clip.w * max_scale_factor)
+    max_height = int(image_clip.h * max_scale_factor)
+
+    image_blurred = image_clip.resize(width=max_width, height=max_height).set_position(
         ("center", "center")
     )
 
