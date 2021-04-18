@@ -87,7 +87,7 @@ def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
     ).set_position(SEGMENT_NAME_ORIGIN)
 
     number_text = mpy.TextClip(
-        txt=f"Number {num}", size=NUMBER_TEXT_SIZE, font=FONT_PATH, color="white"
+        txt=f"{num}", size=NUMBER_TEXT_SIZE, font=FONT_PATH, color="white"
     ).set_position(NUMBER_TEXT_ORIGIN)
 
     image_blurred = image_clip.fl_image(blur_filter)
