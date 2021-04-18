@@ -105,7 +105,7 @@ def extract_video_items(parsed: wtp.WikiText) -> List[VideoItem]:
     return video_items
 
 
-MAX_CHARS = 500
+MAX_CHARS = 250
 
 
 def clean_extract(extract: str) -> str:
