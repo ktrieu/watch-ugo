@@ -73,7 +73,7 @@ BLUR_FILTER = PIL.ImageFilter.GaussianBlur(radius=10)
 
 def blur_filter(frame):
     pil_image = PIL.Image.fromarray(frame)
-    pil_image.filter(BLUR_FILTER)
+    pil_image = pil_image.filter(BLUR_FILTER)
     return np.array(pil_image)
 
 
