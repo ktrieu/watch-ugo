@@ -1,8 +1,12 @@
 import gtts
 import moviepy.editor as mpy
 import requests
+import PIL.ImageFile
 
 import temp
+
+# HACK: Tell PIL to just load slightly damaged images
+PIL.ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def tts_speak(text: str) -> mpy.AudioFileClip:
