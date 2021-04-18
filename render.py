@@ -79,7 +79,7 @@ def blur_filter(frame):
 
 def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
     audio_clip = get_segment_tts(num, segment)
-    image_clip = render_util.image_download(segment.image_url).to_RGB()
+    image_clip = render_util.image_download(segment.image_url)
 
     text_overlay_clip = mpy.ImageClip(OVERLAY_LOCATION)
     name_text = mpy.TextClip(
@@ -125,6 +125,7 @@ def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
     segment_clips = []
     for idx, segment in enumerate(video_def.segments):
         segment_clip = render_segment(idx + 1, segment)
+        segment_clip.save_frame(f"{idx}.png")
         segment_clips.append(segment_clip)
 
     final_video = concatenate_videoclips([intro_clip, *reversed(segment_clips)])
