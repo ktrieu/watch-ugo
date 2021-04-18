@@ -28,8 +28,8 @@ INTRO_SLATE_TEXT_ORIGIN = (147, 462)
 INTRO_SLATE_TEXT_SIZE = (1626, 216)
 
 # Timing constnats
-INTRO_SLATE_WAIT_SECS = 2
-SEGMENT_WAIT_SECS = 1
+INTRO_SLATE_WAIT_SECS = 1
+SEGMENT_WAIT_SECS = 0.5
 
 
 def load_video_def_from_file(file_path: str) -> vid_def.VideoDef:
