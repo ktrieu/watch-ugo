@@ -125,7 +125,6 @@ def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
     segment_clips = []
     for idx, segment in enumerate(video_def.segments):
         segment_clip = render_segment(idx + 1, segment)
-        segment_clip.save_frame(f"{idx}.png")
         segment_clips.append(segment_clip)
 
     final_video = concatenate_videoclips([intro_clip, *reversed(segment_clips)])
