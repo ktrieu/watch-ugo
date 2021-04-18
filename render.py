@@ -81,6 +81,15 @@ def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
     audio_clip = get_segment_tts(num, segment)
     image_clip = render_util.image_download(segment.image_url)
 
+    text_overlay_clip = mpy.ImageClip(OVERLAY_LOCATION)
+    name_text = mpy.TextClip(
+        txt=segment.name, size=SEGMENT_NAME_SIZE, font=FONT_PATH, color="white"
+    ).set_position(SEGMENT_NAME_ORIGIN)
+
+    number_text = mpy.TextClip(
+        txt=f"Number {num}", size=NUMBER_TEXT_SIZE, font=FONT_PATH, color="white"
+    ).set_position(NUMBER_TEXT_ORIGIN)
+
     image_blurred = image_clip.fl_image(blur_filter)
 
     scale_factors = (
@@ -97,7 +106,8 @@ def render_segment(num: int, segment: vid_def.Segment) -> mpy.VideoClip:
 
     return (
         mpy.CompositeVideoClip(
-            [image_blurred, image_clip], size=(VIDEO_WIDTH, VIDEO_HEIGHT)
+            [image_blurred, image_clip, text_overlay_clip, name_text, number_text],
+            size=(VIDEO_WIDTH, VIDEO_HEIGHT),
         )
         .set_duration(audio_clip.duration + SEGMENT_WAIT_SECS)
         .set_fps(24)
@@ -118,4 +128,4 @@ def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
 
 
 def save_file(path: str, clip: mpy.VideoClip):
-    clip.write_videofile(path, threads=4)
+    clip.write_videofile(path, threads=8)
