@@ -93,12 +93,16 @@ def extract_section(section: wtp.Section) -> List[VideoItem]:
     return video_items
 
 
+# Common Wikipedia sections that don't contain useful content
+SECTION_BLACKLIST = ["See also", "Notes", "References"]
+
+
 def extract_video_items(parsed: wtp.WikiText) -> List[VideoItem]:
     video_items = []
 
     for s in parsed.get_sections(include_subsections=True):
         # skip the See Also section, which can contain lists
-        if s.title is not None and s.title.strip() == "See also":
+        if s.title is not None and s.title.strip() in SECTION_BLACKLIST:
             continue
         video_items.extend(extract_section(s))
 
