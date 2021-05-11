@@ -98,7 +98,7 @@ def extract_video_items(parsed: wtp.WikiText) -> List[VideoItem]:
 
     for s in parsed.get_sections(include_subsections=True):
         # skip the See Also section, which can contain lists
-        if s.title == "See also":
+        if s.title is not None and s.title.strip() == "See also":
             continue
         video_items.extend(extract_section(s))
 
