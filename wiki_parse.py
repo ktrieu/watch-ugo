@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 
 import vid_def
 import wiki_api
@@ -84,11 +84,82 @@ def extract_list(wikilist: wtp.WikiList) -> List[VideoItem]:
     return video_items
 
 
+# If a column has more than ACCEPTABLE_UNIQUE_FRACTION unique items, it's eligible
+ACCEPTABLE_UNIQUE_FRACTION = 0.9
+# Some columns have very few links, but as long as there are a few, the column should be eligible
+ACCEPTABLE_LINK_FRACTION = 0.1
+
+
+def parse_column(
+    table: wtp.Table, column_idx: int, n_rows: int
+) -> Tuple[List[wtp.WikiLink], bool]:
+    """
+    Parse a column of a WikiText table. For performance, we return both a list of wikilinks
+    and a boolean indicating eligibility.
+    """
+    unique_links = dict()
+    n_links = 0
+
+    for row in range(n_rows):
+        cell = table.cells(row, column_idx)
+        # skip cells without links
+        if cell is None or len(cell.wikilinks) == 0:
+            continue
+
+        # assume the first link is the only link
+        link = cell.wikilinks[0]
+
+        # links to files don't count
+        if link.target.startswith("File:"):
+            continue
+
+        unique_links[link.title] = link
+        n_links += 1
+
+    # If there are no links we can return early
+    if n_links == 0:
+        return [], False
+
+    # determine eligiblity
+    unique_fraction = len(unique_links) / n_links
+    link_fraction = n_links / n_rows
+
+    eligibility = (
+        unique_fraction > ACCEPTABLE_UNIQUE_FRACTION
+        and link_fraction > ACCEPTABLE_LINK_FRACTION
+    )
+    return list(unique_links.values()), eligibility
+
+
+def extract_table(table: wtp.Table) -> List[VideoItem]:
+    """
+    Extracts ListItems from a table. Again, we use some heuristics:
+    - we return all the wikilinks from the first 'eligible column', where:
+    - an eligible column has 'mostly' unique data
+    - an eligible column has 'mostly' wikilinks
+    """
+
+    video_items = []
+
+    n_rows = len(table.data())
+    n_columns = len(table.data()[0])
+    for i in range(n_columns):
+        links, eligible = parse_column(table, i, n_rows)
+        if eligible:
+            video_items.extend(map(video_item_from_wikilink, links))
+            break
+
+    return video_items
+
+
 def extract_section(section: wtp.Section) -> List[VideoItem]:
     video_items = []
     # according to docs, this weird pattern will flatten lists
     for l in section.get_lists("\*+"):
         video_items.extend(extract_list(l))
+
+    for t in section.get_tables():
+        video_items.extend(extract_table(t))
 
     return video_items
 
