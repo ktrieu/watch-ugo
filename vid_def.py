@@ -74,11 +74,12 @@ def build_description(
 ) -> str:
     description = ""
 
-    description += f"Thank you for watching our video, {video_title}!\nPlease remember to like, favorite, and subscribe for more WatchUGO content!\n"
-    description += f"Sources:\nItems taken from {article_url}.\n"
+    description += f"Thank you for watching our video, {video_title}!\nPlease remember to like, favorite, and subscribe for more WatchUGO content!\n\n"
+    description += f"Sources:\n\nItems taken from {article_url}.\n\n"
 
-    for idx, segment in enumerate(segments):
-        description += f"Number {idx + 1}:\nText from {segment.article_url}\nImage from {segment.image_url}\n"
+    # the rendering code reverses the segments before rendering, so we have to do the same
+    for idx, segment in enumerate(reversed(segments)):
+        description += f"Number {idx + 1}:\nText from {segment.article_url}\nImage from {segment.image_url}\n\n"
 
     return description
 
