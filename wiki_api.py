@@ -1,6 +1,7 @@
 from itertools import islice, takewhile, repeat
 from typing import List, Dict, Callable
 import random
+import html
 
 import mwapi
 
@@ -25,7 +26,10 @@ def split_every(n, iterable):
 
 def get_article_wikitext(article_title: str) -> str:
     response = wikipedia_session.get(
-        action="parse", page=article_title, prop="wikitext", formatversion="2"
+        action="parse",
+        page=html.unescape(article_title),
+        prop="wikitext",
+        formatversion="2",
     )
     return response["parse"]["wikitext"]
 
