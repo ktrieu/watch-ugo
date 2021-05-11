@@ -198,7 +198,7 @@ def get_url_from_article_title(title):
 
     normalized = r["query"].get("normalized", None)
     if normalized:
-        return get_url_from_article_title(normalized["to"])
+        return get_url_from_article_title(normalized[0]["to"])
 
     # get first and only page in the page dictionary
     page = list(r["query"]["pages"].items())[0][1]
