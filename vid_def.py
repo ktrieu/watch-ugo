@@ -59,6 +59,16 @@ def filter_nonexistent_video_items(
     return list(filter(lambda item: exist_dict[item.article_title], items))
 
 
+def remove_duplicate_video_items(
+    items: List[wiki_parse.VideoItem],
+) -> List[wiki_parse.VideoItem]:
+    unique_titles = dict()
+    for item in items:
+        unique_titles[item.article_title] = item
+
+    return list(unique_titles.values())
+
+
 def build_description(
     video_title: str, segments: List[Segment], article_url: str
 ) -> str:
@@ -78,6 +88,7 @@ def video_def_from_list_url(url: str) -> VideoDef:
     parsed = wiki_parse.parse_article_wikitext(article_title)
     video_items = wiki_parse.extract_video_items(parsed)
     video_items = filter_nonexistent_video_items(video_items)
+    video_items = remove_duplicate_video_items(video_items)
 
     # some items may fail after fetching, in which case they return None.
     # So, we iterate through the items randomly, building at most 10.
