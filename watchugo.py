@@ -3,11 +3,17 @@ import os
 
 import vid_def
 import render
-import temp
+import wiki_api
 
 
 def subcommand_build_video_def(args):
-    video_def = vid_def.video_def_from_list_url(args.url)
+    if args.url is not None:
+        url = args.url
+    else:
+        title = wiki_api.get_random_list_article()
+        url = wiki_api.get_url_from_article_title(title)
+        print(f"Selected article {title} ({url}).")
+    video_def = vid_def.video_def_from_list_url(url)
     vid_def.save_video_def(video_def, args.out)
 
 
@@ -40,7 +46,10 @@ def setup_argparser():
         description="Build video definition file(s) from a Wikipedia list article.",
     )
     video_def_parser.add_argument(
-        "url", type=str, help="The URL of the Wikipedia list article."
+        "--url",
+        type=str,
+        default=None,
+        help="The URL of the Wikipedia list article. If not specified, a random article will be selected.",
     )
     video_def_parser.add_argument(
         "--out",

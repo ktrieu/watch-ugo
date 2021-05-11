@@ -1,5 +1,6 @@
 from itertools import islice, takewhile, repeat
-from typing import List, Dict
+from typing import List, Dict, Callable
+import random
 
 import mwapi
 
@@ -136,3 +137,58 @@ def get_articles_exists(article_titles: List[str]) -> Dict[str, bool]:
                 result[denormalized_title] = exists
 
     return result
+
+
+# This is an overestimate to avoid skipping pages
+N_LIST_OF_ARTICLES = 300000
+
+
+def get_random_list_article(progress_lambda: Callable[[int], None] = None) -> str:
+    """
+    Get a random "List of" article title.
+
+    Since this is a long-running operation, a progress_lambda can be passed in that will be called
+    before every request with the number of articles seen.
+    """
+
+    article_idx = random.randint(0, N_LIST_OF_ARTICLES)
+    print(f"Selected random article number {article_idx}.")
+
+    n_articles_seen = 0
+    r = wikipedia_session.get(
+        action="query", list="allpages", aplimit=500, apprefix="List of"
+    )
+    while True:
+        for p in r["query"]["allpages"]:
+            if n_articles_seen == article_idx:
+                return p["title"]
+            n_articles_seen += 1
+        if r.get("continue", None) is None:
+            # we've reached the end, just return the last one
+            return r["query"]["allpages"][-1]["title"]
+        else:
+            if progress_lambda:
+                progress_lambda(n_articles_seen)
+            r = wikipedia_session.get(
+                action="query",
+                list="allpages",
+                aplimit=500,
+                apprefix="List of",
+                apcontinue=r["continue"]["apcontinue"],
+            )
+
+
+def get_url_from_article_title(title):
+    r = wikipedia_session.get(action="query", prop="info", inprop="url", titles=title)
+
+    normalized = r["query"].get("normalized", None)
+    if normalized:
+        return get_url_from_article_title(normalized["to"])
+
+    # get first and only page in the page dictionary
+    page = list(r["query"]["pages"].items())[0][1]
+    url = page.get("fullurl", None)
+    if url is not None:
+        return url
+    else:
+        raise RuntimeError(f"Page {title} not found.")
