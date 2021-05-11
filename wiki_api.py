@@ -30,6 +30,7 @@ def get_article_wikitext(article_title: str) -> str:
         page=html.unescape(article_title),
         prop="wikitext",
         formatversion="2",
+        redirects=True,
     )
     return response["parse"]["wikitext"]
 
