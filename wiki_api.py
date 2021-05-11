@@ -49,9 +49,11 @@ def get_article_image_url(article_title: str) -> str:
     # Since we only ever query one, we can just grab the first one.
     page = list(pages.items())[0][1]
     if "original" in page:
-        return page["original"]["source"]
-    else:
-        return None
+        url = page["original"]["source"]
+        if not url.lower().endswith("svg"):
+            return url
+
+    return None
 
 
 def commons_search_image(search: str) -> Union[str, None]:
@@ -59,8 +61,8 @@ def commons_search_image(search: str) -> Union[str, None]:
     Search Wikimedia Commons for `search`, and returns the *name*
     of the first image result. Returns None if no image was found.
     """
-    # Wikimedia Commons lets us specify a MIME type to filter by images only
-    search_query = search + " filetype:image"
+    # Wikimedia Commons lets us specify a file type to filter by raster images only
+    search_query = search + " filetype:jpg|png"
     response = commons_session.get(
         action="query", list="search", srsearch=search_query, srnamespace="6"
     )
