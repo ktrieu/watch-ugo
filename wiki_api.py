@@ -27,7 +27,7 @@ def split_every(n, iterable):
 def get_article_wikitext(article_title: str) -> str:
     response = wikipedia_session.get(
         action="parse",
-        page=urllib.parse.unquote(article_title),
+        page=article_title,
         prop="wikitext",
         formatversion="2",
         redirects=True,
@@ -206,6 +206,6 @@ def get_url_from_article_title(title):
     page = list(r["query"]["pages"].items())[0][1]
     url = page.get("fullurl", None)
     if url is not None:
-        return url
+        return urllib.parse.unquote(url)
     else:
         raise RuntimeError(f"Page {title} not found.")
