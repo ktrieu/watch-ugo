@@ -27,6 +27,9 @@ def subcommand_render_video(args):
     if args.out is None:
         args.out = get_default_output_path(args.file)
     render.save_file(args.out, clip)
+    print(f"Video saved to {args.out}")
+    print(f"Video title:\n {video_def.title}\n")
+    print(f"Video description:\n {video_def.description}\n")
 
 
 def subcommand_full(args):
