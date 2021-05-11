@@ -1,5 +1,5 @@
 from itertools import islice, takewhile, repeat
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, Union
 import random
 import html
 
@@ -54,10 +54,10 @@ def get_article_image_url(article_title: str) -> str:
         return None
 
 
-def commons_search_image(search: str) -> str:
+def commons_search_image(search: str) -> Union[str, None]:
     """
     Search Wikimedia Commons for `search`, and returns the *name*
-    of the first image result.
+    of the first image result. Returns None if no image was found.
     """
     # Wikimedia Commons lets us specify a MIME type to filter by images only
     search_query = search + " filetype:image"
@@ -65,20 +65,27 @@ def commons_search_image(search: str) -> str:
         action="query", list="search", srsearch=search_query, srnamespace="6"
     )
 
+    if len(response["query"]["search"]) == 0:
+        return None
+
     first_result = response["query"]["search"][0]
 
     return first_result["title"]
 
 
-def get_fallback_article_image_url(article_title: str) -> str:
+def get_fallback_article_image_url(article_title: str) -> Union[str, None]:
     """
     Some Wikipedia articles have no associated image. As a fallback, we search on
     Wikimedia Commons with the article title and grab the first result.
+    Returns None if no fallback image could be found.
     """
     cleaned_article_title = (
         article_title.replace("_", " ").replace("(", "").replace(")", "")
     )
     fallback_image_title = commons_search_image(cleaned_article_title)
+
+    if fallback_image_title is None:
+        return None
 
     response = commons_session.get(
         action="query", prop="imageinfo", titles=fallback_image_title, iiprop="url"

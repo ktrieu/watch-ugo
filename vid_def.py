@@ -60,13 +60,19 @@ def video_def_from_list_url(url: str) -> VideoDef:
     video_items = wiki_parse.extract_video_items(parsed)
     video_items = filter_nonexistent_video_items(video_items)
 
-    n_segments = min(10, len(video_items))
+    # some items may fail after fetching, in which case they return None.
+    # So, we iterate through the items randomly, building at most 10.
+    random.shuffle(video_items)
+    segments = []
 
-    # secret top 10 selection algorithm
-    top_items = random.sample(video_items, n_segments)
-    segments = list(map(wiki_parse.segment_from_video_item, top_items))
+    for item in video_items:
+        segment = wiki_parse.segment_from_video_item(item)
+        if segment is not None:
+            segments.append(segment)
+        if len(segments) == 10:
+            break
 
-    video_title = video_title_from_article_title(article_title, n_segments)
+    video_title = video_title_from_article_title(article_title, len(segments))
     return VideoDef(video_title, segments)
 
 

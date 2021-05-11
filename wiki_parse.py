@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import vid_def
 import wiki_api
@@ -205,7 +205,7 @@ def clean_extract(extract: str) -> str:
     return extract
 
 
-def segment_from_video_item(item: VideoItem) -> "vid_def.Segment":
+def segment_from_video_item(item: VideoItem) -> Union["vid_def.Segment", None]:
     """
     Builds a segment from the given video item.
     """
@@ -214,6 +214,10 @@ def segment_from_video_item(item: VideoItem) -> "vid_def.Segment":
     image_url = wiki_api.get_article_image_url(item.article_title)
     if image_url is None:
         image_url = wiki_api.get_fallback_article_image_url(item.article_title)
+
+    # We really didn't find anything, turf this item
+    if image_url is None:
+        return None
 
     return vid_def.Segment(
         name=item.name, description=segment_desc, image_url=image_url
