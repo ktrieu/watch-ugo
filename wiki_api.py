@@ -75,7 +75,10 @@ def get_fallback_article_image_url(article_title: str) -> str:
     Some Wikipedia articles have no associated image. As a fallback, we search on
     Wikimedia Commons with the article title and grab the first result.
     """
-    fallback_image_title = commons_search_image(article_title)
+    cleaned_article_title = (
+        article_title.replace("_", " ").replace("(", "").replace(")", "")
+    )
+    fallback_image_title = commons_search_image(cleaned_article_title)
 
     response = commons_session.get(
         action="query", prop="imageinfo", titles=fallback_image_title, iiprop="url"
