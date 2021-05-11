@@ -220,5 +220,8 @@ def segment_from_video_item(item: VideoItem) -> Union["vid_def.Segment", None]:
         return None
 
     return vid_def.Segment(
-        name=item.name, description=segment_desc, image_url=image_url
+        name=item.name,
+        description=segment_desc,
+        image_url=image_url,
+        article_url=wiki_api.get_url_from_article_title(item.article_title),
     )

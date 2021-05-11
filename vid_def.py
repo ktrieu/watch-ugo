@@ -17,6 +17,9 @@ class Segment:
     description: str
     # The URL of the image to display in this segment.
     image_url: str
+    # The URL of the article where we got the text.
+    # We preserve this for citation purposes.
+    article_url: str
 
 
 @dataclass
@@ -24,6 +27,8 @@ class VideoDef:
 
     # The title of the video.
     title: str
+    # A YouTube description, with attribution
+    description: str
     # A list of segments to include in the video.
     segments: List[Segment]
 
@@ -54,6 +59,20 @@ def filter_nonexistent_video_items(
     return list(filter(lambda item: exist_dict[item.article_title], items))
 
 
+def build_description(
+    video_title: str, segments: List[Segment], article_url: str
+) -> str:
+    description = ""
+
+    description += f"Thank you for watching our video, {video_title}!\nPlease remember to like, favorite, and subscribe for more WatchUGO content!\n"
+    description += f"Sources:\nItems taken from {article_url}.\n"
+
+    for idx, segment in enumerate(segments):
+        description += f"Number {idx + 1}:\nText from {segment.article_url}\nImage from {segment.image_url}\n"
+
+    return description
+
+
 def video_def_from_list_url(url: str) -> VideoDef:
     article_title = wiki_parse.get_article_title_from_url(url)
     parsed = wiki_parse.parse_article_wikitext(article_title)
@@ -73,7 +92,8 @@ def video_def_from_list_url(url: str) -> VideoDef:
             break
 
     video_title = video_title_from_article_title(article_title, len(segments))
-    return VideoDef(video_title, segments)
+    description = build_description(video_title, segments, url)
+    return VideoDef(title=video_title, description=description, segments=segments)
 
 
 def save_video_def(video_def: VideoDef, output_path: Union[str, None]):
