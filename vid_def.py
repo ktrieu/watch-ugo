@@ -79,7 +79,7 @@ def build_description(
 
     # the rendering code reverses the segments before rendering, so we have to do the same
     for idx, segment in enumerate(reversed(segments)):
-        description += f"Number {idx + 1}:\nText from {segment.article_url}\nImage from {segment.image_url}\n\n"
+        description += f"Number {len(segments) - idx}:\nText from {segment.article_url}\nImage from {segment.image_url}\n\n"
 
     return description
 
