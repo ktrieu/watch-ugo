@@ -108,9 +108,13 @@ def video_def_from_list_url(url: str) -> VideoDef:
     return VideoDef(title=video_title, description=description, segments=segments)
 
 
+def get_video_def_file_name(video_def: VideoDef):
+    return video_def.title.replace(":", "_").replace(" ", "_")
+
+
 def save_video_def(video_def: VideoDef, output_path: Union[str, None]):
     if output_path is None:
-        output_path = f'{video_def.title.replace(":", "_").replace(" ", "_")}.json'
+        output_path = f"{get_video_def_file_name(video_def)}.json"
 
     json = jsonpickle.encode(video_def, indent=True)
 
