@@ -81,6 +81,10 @@ def extract_list(wikilist: wtp.WikiList) -> List[VideoItem]:
         if len(wikilinks) > 0:
             video_items.append(video_item_from_wikilink(wikilinks[0]))
 
+    # recursively parse any sublists
+    for sub_list in wikilist.get_lists():
+        video_items.extend(extract_list(sub_list))
+
     return video_items
 
 
