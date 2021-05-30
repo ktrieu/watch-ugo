@@ -16,6 +16,7 @@ VIDEO_HEIGHT = 1080
 # File locations
 OVERLAY_LOCATION = "img/watchugo_text_overlay.png"
 INTRO_SLATE_LOCATION = "img/watchugo_intro_slate.png"
+OUTRO_SLATE_LOCATION = "img/watchugo_outro_slate.png"
 
 FONT_PATH = "KronaOne-Regular.ttf"
 
@@ -30,6 +31,7 @@ INTRO_SLATE_TEXT_SIZE = (1626, 216)
 
 # Timing constnats
 INTRO_SLATE_WAIT_SECS = 1
+OUTRO_SLATE_WAIT_SECS = 0.5
 SEGMENT_WAIT_SECS = 0.5
 
 
@@ -62,6 +64,23 @@ def render_intro_clip(video_def: vid_def.VideoDef) -> mpy.VideoClip:
     )
 
     return intro_clip
+
+
+OUTRO_TEXT = "Thanks for watching! Please remember to like, favorite, and subscribe!"
+
+
+def render_outro_clip() -> mpy.VideoClip:
+
+    outro_audio = render_util.tts_speak(OUTRO_TEXT)
+    outro_img = mpy.ImageClip(OUTRO_SLATE_LOCATION)
+
+    outro_clip = (
+        outro_img.set_duration(outro_audio.duration + OUTRO_SLATE_WAIT_SECS)
+        .set_fps(24)
+        .set_audio(outro_audio)
+    )
+
+    return outro_clip
 
 
 def get_segment_tts(num: int, segment: vid_def.Segment) -> mpy.AudioClip:
@@ -127,7 +146,9 @@ def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
         segment_clip = render_segment(idx + 1, segment)
         segment_clips.append(segment_clip)
 
-    final_video = concatenate_videoclips([intro_clip, *reversed(segment_clips)])
+    outro_clip = render_outro_clip()
+
+    final_video = concatenate_videoclips([intro_clip, segment_clips[-1], outro_clip])
 
     return final_video
 
