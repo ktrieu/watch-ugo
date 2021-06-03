@@ -148,7 +148,9 @@ def render_video_def(video_def: vid_def.VideoDef) -> mpy.VideoClip:
 
     outro_clip = render_outro_clip()
 
-    final_video = concatenate_videoclips([intro_clip, segment_clips[-1], outro_clip])
+    final_video = concatenate_videoclips(
+        [intro_clip, *reversed(segment_clips), outro_clip]
+    )
 
     return final_video
 
