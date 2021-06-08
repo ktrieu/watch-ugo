@@ -56,7 +56,7 @@ def filter_nonexistent_video_items(
     """
     item_titles = list(map(lambda item: item.article_title, items))
     exist_dict = wiki_api.get_articles_exists(item_titles)
-    return list(filter(lambda item: exist_dict[item.article_title], items))
+    return list(filter(lambda item: exist_dict[item.article_title.lower()], items))
 
 
 def remove_duplicate_video_items(

@@ -151,7 +151,7 @@ def get_articles_exists(article_titles: List[str]) -> Dict[str, bool]:
             for _, page in r["query"]["pages"].items():
                 exists = "missing" not in page
                 denormalized_title = denormalize.get(page["title"], page["title"])
-                result[denormalized_title] = exists
+                result[denormalized_title.lower()] = exists
 
     return result
 
