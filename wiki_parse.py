@@ -146,6 +146,10 @@ def extract_table(table: wtp.Table) -> List[VideoItem]:
     video_items = []
 
     n_rows = len(table.data())
+    if n_rows == 0:
+        # this table is messed up, skip it
+        return []
+
     n_columns = len(table.data()[0])
     for i in range(n_columns):
         links, eligible = parse_column(table, i, n_rows)
