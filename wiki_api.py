@@ -157,7 +157,7 @@ def get_articles_exists(article_titles: List[str]) -> Dict[str, bool]:
 
 
 # This is an overestimate to avoid skipping pages
-N_LIST_OF_ARTICLES = 300000
+N_LIST_OF_ARTICLES = 260000
 
 
 def get_random_list_article(progress_lambda: Callable[[int], None] = None) -> str:
