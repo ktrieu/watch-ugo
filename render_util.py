@@ -1,4 +1,5 @@
 import tempfile
+from wiki_api import USER_AGENT
 import gtts
 import moviepy.editor as mpy
 import requests
@@ -28,7 +29,7 @@ def image_download(url: str):
     Downloads the image at URL and saves it into a
     ImageClip.
     """
-    response = requests.get(url)
+    response = requests.get(url, headers={"User-Agent": USER_AGENT})
 
     with temp.get_temp_file() as temp_file:
         temp_file.write(response.content)

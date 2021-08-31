@@ -6,7 +6,7 @@ import urllib.parse
 import mwapi
 
 
-USER_AGENT = "WatchUGO/1.0 (kevin.trieu5813@gmail.com)"
+USER_AGENT = "WatchUGOBot/1.0 (kevin.trieu5813@gmail.com)"
 
 wikipedia_session = mwapi.Session("https://en.wikipedia.org", user_agent=USER_AGENT)
 
