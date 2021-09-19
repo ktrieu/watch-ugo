@@ -48,6 +48,8 @@ def subcommand_full(args):
     if args.out is None:
         args.out = f"{vid_def.get_video_def_file_name(video_def)}.mp4"
     render.save_file(args.out, clip)
+    print("Description:\n")
+    print(video_def.description)
 
 
 def setup_argparser():
